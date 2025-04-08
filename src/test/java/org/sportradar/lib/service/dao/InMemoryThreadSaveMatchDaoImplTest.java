@@ -6,6 +6,7 @@ import org.sportradar.lib.model.Match;
 import org.sportradar.lib.model.Team;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,7 +15,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class InMemoryThreadSaveMatchDaoImplTest {
 
-    private MatchScoreboardDao matchDao;
+    private MatchScoreboardDao matchDao = new InMemoryThreadSaveMatchScoreboardDaoImpl(Comparator
+            .comparing(Match::getCommonScore)
+            .thenComparing(Match::startTime).reversed());
 
     @AfterEach
     void cleanEach() {

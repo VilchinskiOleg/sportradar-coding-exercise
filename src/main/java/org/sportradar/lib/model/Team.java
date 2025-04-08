@@ -1,4 +1,15 @@
 package org.sportradar.lib.model;
 
-public record Team(String teamId, String name, int score) {
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@AllArgsConstructor
+public class Team {
+
+    private final String teamId;
+    private final String name;
+    @Setter
+    private int score;
 }

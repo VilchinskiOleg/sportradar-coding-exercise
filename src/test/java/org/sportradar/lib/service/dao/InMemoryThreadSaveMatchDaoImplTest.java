@@ -6,6 +6,7 @@ import org.sportradar.lib.model.Match;
 import org.sportradar.lib.model.Team;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class InMemoryThreadSaveMatchDaoImplTest {
 
-    private MatchDao matchDao = new InMemoryThreadSaveMatchDaoImpl();
+    private MatchScoreboardDao matchDao;
 
     @AfterEach
     void cleanEach() {
@@ -26,24 +27,27 @@ public class InMemoryThreadSaveMatchDaoImplTest {
 
         matchDao.create(getMatchMock("HomeTeam-1", 1, "AwayTeam-1", 0));
         matchDao.create(getMatchMock("HomeTeam-2", 2,"AwayTeam-2", 3));
-        Thread.sleep(500);
+        Thread.sleep(1500);
         Match match3 = getMatchMock("HomeTeam-3", 2,"AwayTeam-3", 3);
-        Match createdMatch3 = matchDao.create(match3);
+        matchDao.create(match3);
+        Thread.sleep(500);
+        matchDao.create(getMatchMock("HomeTeam-4", 0,"AwayTeam-4", 0));
 
-        assertEquals(match3, createdMatch3);
         var res = matchDao.findAll();
-        assertEquals(3, matchDao.findAll().size());
-        assertEquals(match3, res.iterator().next());
+        assertEquals(4, matchDao.findAll().size());
+        assertEquals(
+                List.of("HomeTeam-3", "HomeTeam-2", "HomeTeam-1", "HomeTeam-4"),
+                res.stream().map(match -> match.homeTeam().getName()).toList());
     }
 
     @Test
     void testCreateNewMatchAndDelete() {
         assertTrue(matchDao.findAll().isEmpty());
 
-        Match createdMatch = matchDao.create(getMatchMock());
+        Match match = getMatchMock();
 
-        assertEquals(1, matchDao.findAll().size());
-        assertEquals(1, matchDao.delete(createdMatch.matchId()));
+        assertEquals(1, matchDao.create(match).size());
+        assertEquals(0, matchDao.delete(match.matchId()).size());
         assertTrue(matchDao.findAll().isEmpty());
     }
 
@@ -51,15 +55,16 @@ public class InMemoryThreadSaveMatchDaoImplTest {
     void testCreateNewMatchAndUpdateScore() {
         assertTrue(matchDao.findAll().isEmpty());
 
-        Match createdMatch = matchDao.create(getMatchMock());
-        assertEquals(0, createdMatch.homeTeam().score());
-        assertEquals(0, createdMatch.awayTeam().score());
+        Match match = getMatchMock();
+        assertEquals(0, match.homeTeam().getScore());
+        assertEquals(0, match.awayTeam().getScore());
+        matchDao.create(match);
 
         assertEquals(1, matchDao.findAll().size());
-        assertEquals(1, matchDao.updateScore(createdMatch.matchId(), 2, 1));
+        matchDao.updateScore(match.matchId(), 2, 1);
 
-        assertEquals(2, createdMatch.homeTeam().score());
-        assertEquals(1, createdMatch.awayTeam().score());
+        assertEquals(2, match.homeTeam().getScore());
+        assertEquals(1, match.awayTeam().getScore());
     }
 
     private Match getMatchMock() {

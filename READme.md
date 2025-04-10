@@ -1,0 +1,4 @@
+##### Few words about Subscription functionality :
+* Added a subscription mechanism to WorldCupScoreboardService to ensure each client receives real-time updates of the full scoreboard.
+* This is especially important when the service is accessed concurrently by multiple clients — each responsible for updates related to a specific team — while needing to display the full, up-to-date scoreboard across all clients.
+* The parameters map inside ScoreboardStateUpdateEvent is used solely to allow subscribers to identify and ignore updates triggered by their own direct calls to WorldCupScoreboardService.

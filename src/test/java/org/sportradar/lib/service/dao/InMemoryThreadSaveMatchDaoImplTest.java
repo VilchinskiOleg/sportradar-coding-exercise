@@ -2,13 +2,11 @@ package org.sportradar.lib.service.dao;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.sportradar.lib.MatchMockUtils;
 import org.sportradar.lib.model.Match;
-import org.sportradar.lib.model.Team;
 
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,13 +26,13 @@ public class InMemoryThreadSaveMatchDaoImplTest {
     void testCreateNewMatchesAndGetThemAllOrdered() throws InterruptedException {
         assertTrue(matchDao.findAll().isEmpty());
 
-        matchDao.create(getMatchMock("HomeTeam-1", 1, "AwayTeam-1", 0));
-        matchDao.create(getMatchMock("HomeTeam-2", 2,"AwayTeam-2", 3));
+        matchDao.create(MatchMockUtils.getMatchMock("HomeTeam-1", 1, "AwayTeam-1", 0));
+        matchDao.create(MatchMockUtils.getMatchMock("HomeTeam-2", 2,"AwayTeam-2", 3));
         Thread.sleep(1500);
-        Match match3 = getMatchMock("HomeTeam-3", 2,"AwayTeam-3", 3);
+        Match match3 = MatchMockUtils.getMatchMock("HomeTeam-3", 2,"AwayTeam-3", 3);
         matchDao.create(match3);
         Thread.sleep(500);
-        matchDao.create(getMatchMock("HomeTeam-4", 0,"AwayTeam-4", 0));
+        matchDao.create(MatchMockUtils.getMatchMock("HomeTeam-4", 0,"AwayTeam-4", 0));
 
         var res = matchDao.findAll();
         assertEquals(4, matchDao.findAll().size());
@@ -47,7 +45,7 @@ public class InMemoryThreadSaveMatchDaoImplTest {
     void testCreateNewMatchAndDelete() {
         assertTrue(matchDao.findAll().isEmpty());
 
-        Match match = getMatchMock();
+        Match match = MatchMockUtils.getMatchMock();
 
         assertEquals(1, matchDao.create(match).size());
         assertEquals(0, matchDao.delete(match.matchId()).size());
@@ -58,7 +56,7 @@ public class InMemoryThreadSaveMatchDaoImplTest {
     void testCreateNewMatchAndUpdateScore() {
         assertTrue(matchDao.findAll().isEmpty());
 
-        Match match = getMatchMock();
+        Match match = MatchMockUtils.getMatchMock();
         assertEquals(0, match.homeTeam().getScore());
         assertEquals(0, match.awayTeam().getScore());
         matchDao.create(match);
@@ -68,17 +66,5 @@ public class InMemoryThreadSaveMatchDaoImplTest {
 
         assertEquals(2, match.homeTeam().getScore());
         assertEquals(1, match.awayTeam().getScore());
-    }
-
-    private Match getMatchMock() {
-        var homeTeam = new Team(UUID.randomUUID().toString(), "HomeTeam", 0);
-        var awayTeam = new Team(UUID.randomUUID().toString(), "AwayTeam", 0);
-        return new Match(UUID.randomUUID().toString(), LocalDateTime.now(), homeTeam, awayTeam);
-    }
-
-    private Match getMatchMock(String homeTeamName, int homeTeamScore, String awayTeamName, int awayTeamScore) {
-        var homeTeam = new Team(UUID.randomUUID().toString(), homeTeamName, homeTeamScore);
-        var awayTeam = new Team(UUID.randomUUID().toString(), awayTeamName, awayTeamScore);
-        return new Match(UUID.randomUUID().toString(), LocalDateTime.now(), homeTeam, awayTeam);
     }
 }

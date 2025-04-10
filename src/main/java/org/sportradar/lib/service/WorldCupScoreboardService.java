@@ -4,15 +4,22 @@ import lombok.RequiredArgsConstructor;
 import org.sportradar.lib.model.Match;
 import org.sportradar.lib.model.Team;
 import org.sportradar.lib.service.dao.MatchScoreboardDao;
+import org.sportradar.lib.service.subscribtion.ScoreboardStateUpdateSubscriber;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.UUID;
 
 @RequiredArgsConstructor
 public class WorldCupScoreboardService {
 
     private final MatchScoreboardDao matchScoreboardDao;
+    private final Set<ScoreboardStateUpdateSubscriber> subscribers = new HashSet<>();
+
+    public void manageSubscription(ScoreboardStateUpdateSubscriber subscriber, boolean toSubscribe) {
+    }
 
     public Collection<Match> initiateNewMatch(String homeTeamName, String awayTeamName) {
         var newMatch = new Match(

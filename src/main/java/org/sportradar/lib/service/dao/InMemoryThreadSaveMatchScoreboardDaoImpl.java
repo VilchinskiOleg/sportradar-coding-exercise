@@ -43,8 +43,8 @@ public class InMemoryThreadSaveMatchScoreboardDaoImpl implements MatchScoreboard
     @Override
     public NavigableSet<Match> delete(String matchId) {
         Match target = getTargetMatch(matchId);
-        sortedItems.remove(target);
         itemsById.remove(matchId);
+        sortedItems.remove(target);
         return sortedItems;
     }
 
